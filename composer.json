@@ -1,0 +1,22 @@
+{
+    "name": "mihailshumilov/readability",
+    "type": "library",
+    "description": "",
+    "keywords": ["readability"],
+    "homepage": "https://github.com/mihailShumilov/readability",
+    "authors": [
+        {
+            "name" : "Mihail Shumilov"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "license": "LGPL-2.1",
+	"repositories": [
+        {
+            "url": "https://github.com/mihailShumilov/readability.git",
+            "type": "git"
+        }
+    ]
+}
