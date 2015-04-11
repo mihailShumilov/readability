@@ -17,7 +17,22 @@
         private $maxScore = 0;
         private $contentNode = false;
 
-        private $badTags = [ 'header', 'footer', 'nav', 'script', 'sidebar', 'noscript', 'noindex', 'table', 'ul' ];
+        private $badTags = [
+            'header',
+            'footer',
+            'nav',
+            'script',
+            'sidebar',
+            'noscript',
+            'noindex',
+            'table',
+            'ul',
+            'form',
+            'input',
+            'button',
+            'ol',
+            'iframe'
+        ];
 
 
         public function __construct( $url )
@@ -56,10 +71,10 @@
 
         private function clean()
         {
+            $xpath = new \DOMXpath( $this->dom );
             foreach ($this->badTags as $tag) {
-                $elements = $this->dom->getElementsByTagName( $tag );
-                while ($el = $elements->item( 0 )) {
-                    $el->parentNode->removeChild( $el );
+                foreach ($xpath->query( '//' . $tag ) as $node) {
+                    $node->parentNode->removeChild( $node );
                 }
             }
             return $this->dom->saveHTML();
@@ -110,7 +125,7 @@
         {
             foreach ($this->contentNode->childNodes as $element) {
                 if (is_a( $element, 'DOMElement' )) {
-                    if (( $element->getAttribute( "score" ) / $this->maxScore ) > 0.5) {
+                    if (( $element->getAttribute( "score" ) / $this->maxScore ) > 0.4) {
                         $this->contentNode = $element;
                         $this->maxScore    = $element->getAttribute( "score" );
                         break;
