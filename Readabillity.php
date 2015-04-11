@@ -35,6 +35,7 @@
                 $this->createDomObject();
                 $this->clean();
                 $this->calculateWeight();
+                $this->clearContentNode();
 
                 $Document = new \DOMDocument();
                 $Document->appendChild( $Document->importNode( $this->contentNode, true ) );
@@ -96,6 +97,24 @@
             foreach ($node->childNodes as $element) {
                 if ($element->childNodes) {
                     $this->processNode( $element, $level );
+                }
+            }
+        }
+
+        private function clearContentNode()
+        {
+            $this->tryDetectMainContentNode();
+        }
+
+        private function tryDetectMainContentNode()
+        {
+            foreach ($this->contentNode->childNodes as $element) {
+                if (is_a( $element, 'DOMElement' )) {
+                    if (( $element->getAttribute( "score" ) / $this->maxScore ) > 0.8) {
+                        $this->contentNode = $element;
+                        $this->maxScore    = $element->getAttribute( "score" );
+                        break;
+                    }
                 }
             }
         }
