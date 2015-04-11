@@ -110,7 +110,7 @@
         {
             foreach ($this->contentNode->childNodes as $element) {
                 if (is_a( $element, 'DOMElement' )) {
-                    if (( $element->getAttribute( "score" ) / $this->maxScore ) > 0.8) {
+                    if (( $element->getAttribute( "score" ) / $this->maxScore ) > 0.5) {
                         $this->contentNode = $element;
                         $this->maxScore    = $element->getAttribute( "score" );
                         break;
