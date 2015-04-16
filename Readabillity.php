@@ -31,7 +31,13 @@
             'input',
             'button',
             'ol',
-            'iframe'
+            'iframe',
+            'style',
+            'address',
+            'ol',
+            'dd',
+            'dt',
+            'li'
         ];
 
 
@@ -54,7 +60,20 @@
 
                 $Document = new \DOMDocument();
                 $Document->appendChild( $Document->importNode( $this->contentNode, true ) );
-                return $Document->saveHTML();
+                $this->data = $Document->saveHTML();
+
+                $this->createDomObject();
+                $this->calculateWeight();
+                $this->clearByScore();
+
+                $this->data = $this->dom->saveHTML();
+
+                $this->createDomObject();
+                $this->calculateWeight();
+                $this->clearContentNode();
+                $this->clearByScore();
+
+                return $this->dom->saveHTML();
             } else {
                 return false;
             }
@@ -106,14 +125,39 @@
                 $this->contentNode = $node;
             }
 
+            $linkCount = 1;
+
+
+            foreach ($node->childNodes as $element) {
+                if ($element->childNodes) {
+                    $linkCount += $this->processNode( $element, $level );
+                }
+            }
+
+            $ls        = $textLength / $linkCount;
+            $linkScore = "good";
+            if ($ls <= 10 && $ls > 0) {
+                $linkScore = "bad";
+            }
+            if ("a" == $node->tagName) {
+                if ($textLength <= 40) {
+                    $linkScore = "good";
+                } else {
+                    $linkScore = "bad";
+                }
+            }
             $node->setAttribute( "level", $level );
             $node->setAttribute( "charcount", $textLength );
             $node->setAttribute( "score", $score );
-            foreach ($node->childNodes as $element) {
-                if ($element->childNodes) {
-                    $this->processNode( $element, $level );
-                }
+            $node->setAttribute( "linkcount", $linkCount );
+            $node->setAttribute( "linkscore", $linkScore );
+            $node->setAttribute( "linkscorevalue", $ls );
+
+            if ("a" == $node->tagName) {
+                $linkCount ++;
             }
+
+            return $linkCount;
         }
 
         private function clearContentNode()
@@ -133,4 +177,19 @@
                 }
             }
         }
+
+        /**
+         * @param bool|DOMElement $node
+         */
+        private function clearByScore( $node = false )
+        {
+            $xpath = new \DOMXpath( $this->dom );
+
+            foreach ($xpath->query( "//*[@linkscore='bad']" ) as $node) {
+                $node->parentNode->removeChild( $node );
+            }
+
+            return $this->dom->saveHTML();
+        }
+
     }

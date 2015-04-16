@@ -12,6 +12,8 @@
     $url = "http://www.segodnya.ua/politics/pnews/plany-rady-na-nedelyu-otmena-zaloga-dlya-korrupcionerov-sozdanie-komissiy-i-mitingi-605536.html";
     $url = "http://www.washingtontimes.com/news/2015/apr/2/f-35-comes-400k-helmet-pilot-can-see-through-plane/";
     $url = "http://jurliga.ligazakon.ua/news/2015/4/7/126778.htm";
+    $url = "http://ain.ua/2015/04/15/575389";
+    $url = "http://www.phpbuilder.com/columns/DOM-XML-extension/Octavia_Anghel102710.php3";
 
     $r = new \readability\Readabillity( $url );
     echo $r->getContent();
