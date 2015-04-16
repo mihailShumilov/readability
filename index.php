@@ -5,15 +5,41 @@
      * Date: 4/5/15
      * Time: 21:51
      */
-    require_once( 'Readabillity.php' );
-    require_once( 'PageLoader.php' );
+?>
+<!DOCTYPE html>
 
-    $url = "http://www.foxnews.com/politics/2015/04/05/corker-works-overtime-to-get-last-few-votes-to-ensure-congress-has-mandatory/#";
-    $url = "http://www.segodnya.ua/politics/pnews/plany-rady-na-nedelyu-otmena-zaloga-dlya-korrupcionerov-sozdanie-komissiy-i-mitingi-605536.html";
-    $url = "http://www.washingtontimes.com/news/2015/apr/2/f-35-comes-400k-helmet-pilot-can-see-through-plane/";
-    $url = "http://jurliga.ligazakon.ua/news/2015/4/7/126778.htm";
-    $url = "http://ain.ua/2015/04/15/575389";
-    $url = "http://www.phpbuilder.com/columns/DOM-XML-extension/Octavia_Anghel102710.php3";
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 
-    $r = new \readability\Readabillity( $url );
-    echo $r->getContent();
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+</head>
+<body style="padding-top: 40px;">
+<div class="container">
+    <form method="post" class="form-signin">
+        <h2 class="form-signin-heading">Please enter url</h2>
+        <input class="form-control" type="text" name="url"
+               value="<?php echo isset( $_POST['url'] ) ? $_POST['url'] : ''; ?>"/>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Submit</button>
+    </form>
+</div>
+<div class="container-fluid">
+    <?php
+
+        if (isset( $_POST['url'] ) && ! empty( $_POST['url'] )) {
+            require_once( 'Readabillity.php' );
+            require_once( 'PageLoader.php' );
+
+            $r = new \readability\Readabillity( $_POST['url'] );
+            echo $r->getContent();
+        }
+    ?>
+</div>
+</body>
+</html>

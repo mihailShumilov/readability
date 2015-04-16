@@ -46,7 +46,7 @@
             if (filter_var( $url, FILTER_VALIDATE_URL )) {
                 $this->url = $url;
             } else {
-                throw new Exception( "Parameter `$url` not valid" );
+                throw new \Exception( "Parameter `$url` not valid" );
             }
         }
 
