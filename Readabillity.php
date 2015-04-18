@@ -26,7 +26,7 @@
             'noscript',
             'noindex',
             'table',
-            'ul',
+//            'ul',
             'form',
             'input',
             'button',
@@ -37,7 +37,7 @@
             'ol',
             'dd',
             'dt',
-            'li'
+//            'li'
         ];
 
 
