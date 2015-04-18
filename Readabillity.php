@@ -40,6 +40,12 @@
 //            'li'
         ];
 
+        private $badCssSelector = [
+            "//*[starts-with(@id, 'comment')]",
+            "//*[starts-with(@class, 'comment'])"
+        ];
+
+
 
         public function __construct( $url )
         {
@@ -96,6 +102,13 @@
                     $node->parentNode->removeChild( $node );
                 }
             }
+            foreach ($this->badCssSelector as $selector) {
+                if ($nodeList = $xpath->query( $selector )) {
+                    foreach ($nodeList as $node) {
+                        $node->parentNode->removeChild( $node );
+                    }
+                }
+            }
             return $this->dom->saveHTML();
         }
 
@@ -111,14 +124,15 @@
          * @param DOMElement $node
          * @param int $level
          */
-        private function processNode( $node, $level )
+        private function processNode( $node, $level, &$position = 1 )
         {
             $level ++;
+            $selfPosition = $position;
 
             $text = $node->nodeValue;
             preg_replace( "/\s+/", "", $text );
             $textLength = strlen( $text );
-            $score      = $textLength * $level;
+            $score        = ( $textLength * $level );
 
             if ($this->maxScore < $score) {
                 $this->maxScore    = $score;
@@ -129,8 +143,9 @@
 
 
             foreach ($node->childNodes as $element) {
+                $position ++;
                 if ($element->childNodes) {
-                    $linkCount += $this->processNode( $element, $level );
+                    $linkCount += $this->processNode( $element, $level, $position );
                 }
             }
 
@@ -152,6 +167,7 @@
             $node->setAttribute( "linkcount", $linkCount );
             $node->setAttribute( "linkscore", $linkScore );
             $node->setAttribute( "linkscorevalue", $ls );
+            $node->setAttribute( "position", $selfPosition );
 
             if ("a" == $node->tagName) {
                 $linkCount ++;
