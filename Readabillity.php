@@ -27,22 +27,32 @@
             'noindex',
             'table',
 //            'ul',
-            'form',
+//            'form',
             'input',
             'button',
             'ol',
             'iframe',
             'style',
             'address',
-            'ol',
             'dd',
             'dt',
 //            'li'
         ];
 
+        private $baseBadCssSelector = [
+            "//*[php:function('preg_match', '/comment/iu', string(@id))>0]",
+            "//*[php:function('preg_match', '/comment/iu', string(@class))>0]",
+        ];
+
         private $badCssSelector = [
-            "//*[starts-with(@id, 'comment')]",
-            "//*[starts-with(@class, 'comment'])"
+            "//*[php:function('preg_match', '/comment/iu', string(@id))>0]",
+            "//*[php:function('preg_match', '/comment/iu', string(@class))>0]",
+            "//*[php:function('preg_match', '/sidebar/iu', string(@id))>0]",
+            "//*[php:function('preg_match', '/sidebar/iu', string(@class))>0]",
+            "//*[php:function('preg_match', '/tag/iu', string(@id))>0]",
+            "//*[php:function('preg_match', '/tag/iu', string(@class))>0]",
+            "//*[php:function('preg_match', '/error/iu', string(@id))>0]",
+            "//*[php:function('preg_match', '/error/iu', string(@class))>0]"
         ];
 
 
@@ -61,6 +71,7 @@
             if ($this->data = PageLoader::load( $this->url )) {
                 $this->createDomObject();
                 $this->clean();
+
                 $this->calculateWeight();
                 $this->clearContentNode();
 
@@ -78,6 +89,9 @@
                 $this->calculateWeight();
                 $this->clearContentNode();
                 $this->clearByScore();
+
+                $this->cleanByCSS();
+
 
                 return $this->dom->saveHTML();
             } else {
@@ -97,11 +111,33 @@
         private function clean()
         {
             $xpath = new \DOMXpath( $this->dom );
+
             foreach ($this->badTags as $tag) {
                 foreach ($xpath->query( '//' . $tag ) as $node) {
                     $node->parentNode->removeChild( $node );
                 }
             }
+
+            $xpath->registerNamespace( "php", "http://php.net/xpath" );
+            $xpath->registerPHPFunctions();
+
+            foreach ($this->baseBadCssSelector as $selector) {
+                if ($nodeList = $xpath->query( $selector )) {
+                    foreach ($nodeList as $node) {
+                        $node->parentNode->removeChild( $node );
+                    }
+                }
+            }
+
+            return $this->dom->saveHTML();
+        }
+
+        private function cleanByCSS()
+        {
+            $xpath = new \DOMXpath( $this->dom );
+            $xpath->registerNamespace( "php", "http://php.net/xpath" );
+            $xpath->registerPHPFunctions();
+
             foreach ($this->badCssSelector as $selector) {
                 if ($nodeList = $xpath->query( $selector )) {
                     foreach ($nodeList as $node) {
