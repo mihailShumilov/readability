@@ -34,7 +34,6 @@
 
         if (isset( $_POST['url'] ) && ! empty( $_POST['url'] )) {
             require_once( 'Readabillity.php' );
-            require_once( 'PageLoader.php' );
 
             $r = new \readability\Readabillity( $_POST['url'] );
             echo $r->getContent();
