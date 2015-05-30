@@ -18,27 +18,40 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
 
     <!-- Latest compiled and minified JavaScript -->
+    <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 </head>
 <body style="padding-top: 40px;">
 <div class="container">
-    <form method="post" class="form-signin">
+    <form method="get" class="form-signin">
         <h2 class="form-signin-heading">Please enter url</h2>
         <input class="form-control" type="text" name="url"
-               value="<?php echo isset( $_POST['url'] ) ? $_POST['url'] : ''; ?>"/>
+               value="<?php echo isset( $_REQUEST['url'] ) ? $_REQUEST['url'] : ''; ?>"/>
         <button class="btn btn-lg btn-primary btn-block" type="submit">Submit</button>
     </form>
 </div>
 <div class="container-fluid">
-    <?php
+    <div class="row-fluid">
+        <div class="col-xs-6">
+            <h1>Parsed</h1>
+            <?php
 
-        if (isset( $_POST['url'] ) && ! empty( $_POST['url'] )) {
-            require_once( 'Readabillity.php' );
+                if (isset( $_REQUEST['url'] ) && ! empty( $_REQUEST['url'] )) {
+                    require_once( 'Readabillity.php' );
 
-            $r = new \readability\Readabillity( $_POST['url'] );
-            echo $r->getContent();
-        }
-    ?>
+                    $r = new \readability\Readabillity( $_REQUEST['url'] );
+                    echo $r->getContent();
+                }
+            ?>
+        </div>
+        <div class="col-xs-6">
+            <h1>Source</h1>
+            <?php if (isset( $_REQUEST['url'] )): ?>
+                <iframe width="100%" height="500px" src="<?= $_REQUEST['url']; ?>"></iframe>
+            <?php endif; ?>
+        </div>
+    </div>
+
 </div>
 <script>
     (
