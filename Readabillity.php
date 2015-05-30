@@ -25,9 +25,9 @@
             'sidebar',
             'noscript',
             'noindex',
-            'table',
+//            'table',
 //            'ul',
-            'form',
+//            'form',
             'input',
             'button',
             'ol',
@@ -82,11 +82,13 @@
                 $this->clean();
 
                 $this->calculateWeight();
+
                 $this->clearContentNode();
 
                 $Document = new \DOMDocument();
                 $Document->appendChild( $Document->importNode( $this->contentNode, true ) );
                 $this->data = $Document->saveHTML();
+
 
                 $this->createDomObject();
                 $this->calculateWeight();
