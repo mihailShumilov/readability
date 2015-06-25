@@ -51,6 +51,9 @@
             "//*[php:function('preg_match', '/header/iu', string(@class))>0]",
             "//*[php:function('preg_match', '/menu/iu', string(@class))>0]",
             "//*[php:function('preg_match', '/menu/iu', string(@class))>0]",
+//            "//*[php:function('preg_match', '/sidebar/iu', string(@id))>0]",
+//            "//*[php:function('preg_match', '/sidebar/iu', string(@class))>0]"
+
         ];
 
         private $badCssSelector = [
@@ -233,7 +236,7 @@
         {
             foreach ($this->contentNode->childNodes as $element) {
                 if (is_a( $element, 'DOMElement' )) {
-                    if (( $element->getAttribute( "score" ) / $this->maxScore ) > 0.4) {
+                    if (( ( $element->getAttribute( "score" ) / $this->maxScore ) > 0.4 ) && ( "body" != $element->tagName )) {
                         $this->contentNode = $element;
                         $this->maxScore    = $element->getAttribute( "score" );
                         break;
@@ -297,18 +300,18 @@
                             $data = mb_convert_encoding( $data, "UTF-8" );
                         }
                     }
-                    $tidyConfig = [
-                        'clean'            => true,
-                        'drop-empty-paras' => true,
-                        'drop-font-tags'   => true,
-                        'fix-backslash'    => true,
-                        'fix-bad-comments' => true,
-                        'fix-uri'          => true,
-                        'hide-comments'    => true
-                    ];
-                    $tidy       = tidy_parse_string( $data, $tidyConfig, 'utf8' );
-                    $tidy->cleanRepair();
-                    $body = $tidy->html();
+//                    $tidyConfig = [
+//                        'clean'            => true,
+//                        'drop-empty-paras' => true,
+//                        'drop-font-tags'   => true,
+//                        'fix-backslash'    => true,
+//                        'fix-bad-comments' => true,
+//                        'fix-uri'          => true,
+//                        'hide-comments'    => true
+//                    ];
+//                    $tidy       = tidy_parse_string( $data, $tidyConfig, 'utf8' );
+//                    $tidy->cleanRepair();
+//                    $body = $tidy->html();
 //                    return $body->value;
 
                     return $data;
