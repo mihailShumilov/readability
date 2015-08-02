@@ -6,17 +6,45 @@
      * Time: 21:29
      */
 
+
     namespace readability;
+
+    require_once 'vendor/autoload.php';
+
+    use Goutte\Client;
+
+
 
     class Readabillity
     {
 
+        /**
+         * @var string
+         */
         private $url;
+
+        /**
+         * @var string
+         */
         private $data;
+        /**
+         * @var \DOMDocument
+         */
         private $dom;
+
+        /**
+         * @var int
+         */
         private $maxScore = 0;
+
+        /**
+         * @var bool
+         */
         private $contentNode = false;
 
+        /**
+         * @var array
+         */
         private $badTags = [
             'header',
             'footer',
@@ -40,6 +68,9 @@
             'time'
         ];
 
+        /**
+         * @var array
+         */
         private $baseBadCssSelector = [
             "//*[php:function('preg_match', '/comment/iu', string(@id))>0]",
             "//*[php:function('preg_match', '/coment/iu', string(@id))>0]",
@@ -91,6 +122,7 @@
                 $Document = new \DOMDocument();
                 $Document->appendChild( $Document->importNode( $this->contentNode, true ) );
                 $this->data = $Document->saveHTML();
+//                return $this->data;
 
 
                 $this->createDomObject();
@@ -98,6 +130,7 @@
                 $this->clearByScore();
 
                 $this->data = $this->dom->saveHTML();
+//                return $this->data;
 
                 $this->createDomObject();
                 $this->calculateWeight();
@@ -261,60 +294,77 @@
 
         private function loadAsUTF8( $url, $postParams = false )
         {
-
             if (filter_var( $url, FILTER_VALIDATE_URL )) {
                 try {
-                    $ch      = curl_init();
-                    $timeout = 30;
-                    curl_setopt( $ch, CURLOPT_URL, $url );
-                    curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
-                    curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, $timeout );
-                    curl_setopt( $ch, CURLOPT_TIMEOUT, $timeout );
-                    curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, true );
-                    curl_setopt(
-                        $ch,
-                        CURLOPT_USERAGENT,
-                        'Mozilla/5.0 (Windows; U; Windows NT 5.1; ru-RU; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13'
-                    );
-                    curl_setopt( $ch, CURLOPT_REFERER, "http://nagg.in.ua/" );
-                    curl_setopt( $ch, CURLOPT_ENCODING, 'UTF-8' );
-                    if (isset( $postParams ) && ! empty( $postParams )) {
-                        curl_setopt( $ch, CURLOPT_HTTP_VERSION, '1.1' );
-                        curl_setopt( $ch, CURLOPT_POST, 1 );
-                        curl_setopt( $ch, CURLOPT_POSTFIELDS, $postParams );
-                    }
-                    $data        = curl_exec( $ch );
-                    $information = curl_getinfo( $ch, CURLINFO_CONTENT_TYPE );
 
-                    preg_match( '/charset=([a-z\-0-9]+)/i', $information, $headerMatch );
-                    if (isset( $headerMatch[1] )) {
-                        $data = mb_convert_encoding( $data, "UTF-8", strtolower( $headerMatch[1] ) );
-                    } else {
-                        preg_match( '/<meta.*?charset="?([a-z\-0-9]*)"?/i', $data, $matches );
-                        if (isset( $matches[1] )) {
+                    $client = new Client();
+                    $client->getClient()->setDefaultOption( 'config/curl/' . CURLOPT_TIMEOUT, 60 );
 
-                            if ($charset = $matches[1]) {
-                                $data = mb_convert_encoding( $data, "UTF-8", strtolower( $charset ) );
-                            }
-                        } else {
-                            $data = mb_convert_encoding( $data, "UTF-8" );
-                        }
-                    }
-//                    $tidyConfig = [
-//                        'clean'            => true,
-//                        'drop-empty-paras' => true,
-//                        'drop-font-tags'   => true,
-//                        'fix-backslash'    => true,
-//                        'fix-bad-comments' => true,
-//                        'fix-uri'          => true,
-//                        'hide-comments'    => true
-//                    ];
-//                    $tidy       = tidy_parse_string( $data, $tidyConfig, 'utf8' );
-//                    $tidy->cleanRepair();
-//                    $body = $tidy->html();
-//                    return $body->value;
-
+                    $crawler = $client->request( 'GET', $url );
+                    $data    = "";
+                    $body    = $crawler->filter( 'body' )->getNode();
+                    echo "<pre>";
+                    var_dump( $body->textContent );
+                    die();
                     return $data;
+
+
+//                exec('PATH="$PATH:/usr/local/bin/"; phantomjs loadScript.js '.$url, $data);
+//
+//                return join("\n",$data);
+//
+//
+//                    $ch      = curl_init();
+//                    $timeout = 30;
+//                    curl_setopt( $ch, CURLOPT_URL, $url );
+//                    curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
+//                    curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, $timeout );
+//                    curl_setopt( $ch, CURLOPT_TIMEOUT, $timeout );
+//                    curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, true );
+//                    curl_setopt(
+//                        $ch,
+//                        CURLOPT_USERAGENT,
+//                        'Mozilla/5.0 (Windows; U; Windows NT 5.1; ru-RU; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13'
+//                    );
+//                    curl_setopt( $ch, CURLOPT_REFERER, "http://nagg.in.ua/" );
+//                    curl_setopt( $ch, CURLOPT_ENCODING, 'UTF-8' );
+//                    if (isset( $postParams ) && ! empty( $postParams )) {
+//                        curl_setopt( $ch, CURLOPT_HTTP_VERSION, '1.1' );
+//                        curl_setopt( $ch, CURLOPT_POST, 1 );
+//                        curl_setopt( $ch, CURLOPT_POSTFIELDS, $postParams );
+//                    }
+//                    $data        = curl_exec( $ch );
+//                    $information = curl_getinfo( $ch, CURLINFO_CONTENT_TYPE );
+//
+//                    preg_match( '/charset=([a-z\-0-9]+)/i', $information, $headerMatch );
+//                    if (isset( $headerMatch[1] )) {
+//                        $data = mb_convert_encoding( $data, "UTF-8", strtolower( $headerMatch[1] ) );
+//                    } else {
+//                        preg_match( '/<meta.*?charset="?([a-z\-0-9]*)"?/i', $data, $matches );
+//                        if (isset( $matches[1] )) {
+//
+//                            if ($charset = $matches[1]) {
+//                                $data = mb_convert_encoding( $data, "UTF-8", strtolower( $charset ) );
+//                            }
+//                        } else {
+//                            $data = mb_convert_encoding( $data, "UTF-8" );
+//                        }
+//                    }
+////                    $tidyConfig = [
+////                        'clean'            => true,
+////                        'drop-empty-paras' => true,
+////                        'drop-font-tags'   => true,
+////                        'fix-backslash'    => true,
+////                        'fix-bad-comments' => true,
+////                        'fix-uri'          => true,
+////                        'hide-comments'    => true
+////                    ];
+////                    $tidy       = tidy_parse_string( $data, $tidyConfig, 'utf8' );
+////                    $tidy->cleanRepair();
+////                    $body = $tidy->html();
+////                    return $body->value;
+//
+//                    return $data;
                 } catch ( Exception $e ) {
                     return false;
                 }
