@@ -68,18 +68,45 @@
         ];
 
 
-        public function __construct( $url )
+        public function __construct( $url = false, $rawHtml = false )
         {
-            if (filter_var( $url, FILTER_VALIDATE_URL )) {
-                $this->url = $url;
-            } else {
-                throw new \Exception( "Parameter `$url` not valid" );
-            }
+
+        	if(!$url && !$rawHtml){
+        		throw new \Exception("At least one parameter should be set");
+	        }
+        	if($url) {
+		        if ( filter_var( $url, FILTER_VALIDATE_URL ) ) {
+			        $this->url = $url;
+		        } else {
+			        throw new \Exception( "Parameter `$url` not valid" );
+		        }
+
+		        $this->data = $this->loadAsUTF8( $this->url );
+	        }
+	        if($rawHtml){
+        		$this->data = $this->prepareRawData($rawHtml);
+	        }
+
+        }
+
+
+        private function prepareRawData($rawHtml){
+        	$data = $rawHtml;
+	        preg_match( '/<meta.*?charset="?([a-z\-0-9]*)"?/i', $data, $matches );
+	        if (isset( $matches[1] )) {
+
+		        if ($charset = $matches[1]) {
+			        $data = mb_convert_encoding( $data, "UTF-8", strtolower( $charset ) );
+		        }
+	        } else {
+		        $data = mb_convert_encoding( $data, "UTF-8" );
+	        }
+	        return $data;
         }
 
         public function getContent()
         {
-            if ($this->data = $this->loadAsUTF8( $this->url )) {
+            if ($this->data) {
 //                return $this->data;
                 $this->createDomObject();
                 $this->clean();
