@@ -6,7 +6,7 @@
      * Time: 21:29
      */
 
-    namespace mihailshumilov\readabillity;
+    namespace mihailshumilov;
 
     class Readabillity
     {
