@@ -14,8 +14,10 @@
   "require": {
     "php": ">=5.3.0"
   },
-  "psr-4": {
-    "mihailshumilov\\readability\\": "src/"
+  "autoload": {
+    "psr-4": {
+      "mihailshumilov\\readability\\": "src/"
+    }
   },
   "license": "LGPL-2.1",
   "repositories": [
