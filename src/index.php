@@ -37,7 +37,7 @@
             <?php
 
                 if (isset( $_REQUEST['url'] ) && ! empty( $_REQUEST['url'] )) {
-                    require_once( 'Readabillity.php' );
+                    require_once('Readabillity.php');
 
                     $r = new \readability\Readabillity( $_REQUEST['url'] );
                     echo $r->getContent();
