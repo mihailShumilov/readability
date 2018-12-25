@@ -115,12 +115,17 @@
 
                 $this->clearContentNode();
 
-                $Document = new \DOMDocument();
-                $Document->appendChild( $Document->importNode( $this->contentNode, true ) );
-                $this->data = $Document->saveHTML();
+//                $Document = new \DOMDocument();
+//                $Document->appendChild( $Document->importNode( $this->contentNode, true ) );
+//                $this->data = $Document->saveHTML();
 
+//                return $this->dom->saveHTML();
+//                return $this->data;
+
+                $this->data = $this->dom->saveHTML();
 
                 $this->createDomObject();
+
                 $this->calculateWeight();
                 $this->clearByScore();
 
@@ -142,8 +147,8 @@
 
         protected function createDomObject()
         {
-            $this->data = mb_convert_encoding( $this->data, 'HTML-ENTITIES', "UTF-8" );
-            $this->dom  = new \DOMDocument( "1.0", "utf-8" );
+            $this->data = mb_convert_encoding( $this->data, 'UTF-8', 'UTF-8' );
+            $this->dom  = new \DOMDocument( '1.0', 'utf-8' );
             libxml_use_internal_errors( true );
             $this->dom->preserveWhiteSpace = false;
             $this->dom->loadHTML( $this->data );
@@ -159,7 +164,7 @@
                 }
             }
 
-            $xpath->registerNamespace( "php", "http://php.net/xpath" );
+            $xpath->registerNamespace( 'php', 'http://php.net/xpath' );
             $xpath->registerPHPFunctions();
 
             foreach ($this->baseBadCssSelector as $selector) {
@@ -176,7 +181,7 @@
         private function cleanByCSS()
         {
             $xpath = new \DOMXpath( $this->dom );
-            $xpath->registerNamespace( "php", "http://php.net/xpath" );
+            $xpath->registerNamespace( 'php', 'http://php.net/xpath' );
             $xpath->registerPHPFunctions();
 
             foreach ($this->badCssSelector as $selector) {
@@ -207,7 +212,7 @@
             $selfPosition = $position;
 
             $text = $node->nodeValue;
-            preg_replace( "/\s+/", "", $text );
+            preg_replace( '/\s+/', '', $text );
             $textLength = strlen( $text );
 //            $score      = ( $textLength * $level ) / $position;
             $score = ( $textLength * $level );
@@ -228,26 +233,26 @@
             }
 
             $ls        = $textLength / $linkCount;
-            $linkScore = "good";
+            $linkScore = 'good';
             if ($ls <= 10 && $ls > 0) {
-                $linkScore = "bad";
+                $linkScore = 'bad';
             }
-            if ("a" == $node->tagName) {
+            if ('a' == $node->tagName) {
                 if ($textLength <= 40) {
-                    $linkScore = "good";
+                    $linkScore = 'good';
                 } else {
-                    $linkScore = "bad";
+                    $linkScore = 'bad';
                 }
             }
-            $node->setAttribute( "level", $level );
-            $node->setAttribute( "charcount", $textLength );
-            $node->setAttribute( "score", $score );
-            $node->setAttribute( "linkcount", $linkCount );
-            $node->setAttribute( "linkscore", $linkScore );
-            $node->setAttribute( "linkscorevalue", $ls );
-            $node->setAttribute( "position", $selfPosition );
+            $node->setAttribute( 'level', $level );
+            $node->setAttribute( 'charcount', $textLength );
+            $node->setAttribute( 'score', $score );
+            $node->setAttribute( 'linkcount', $linkCount );
+            $node->setAttribute( 'linkscore', $linkScore );
+            $node->setAttribute( 'linkscorevalue', $ls );
+            $node->setAttribute( 'position', $selfPosition );
 
-            if ("a" == $node->tagName) {
+            if ('a' == $node->tagName) {
                 $linkCount ++;
             }
 
@@ -263,9 +268,9 @@
         {
             foreach ($this->contentNode->childNodes as $element) {
                 if (is_a( $element, 'DOMElement' )) {
-                    if (( ( $element->getAttribute( "score" ) / $this->maxScore ) > 0.4 ) && ( "body" != $element->tagName )) {
+                    if (( ( $element->getAttribute( 'score' ) / $this->maxScore ) > 0.4 ) && ( 'body' != $element->tagName )) {
                         $this->contentNode = $element;
-                        $this->maxScore    = $element->getAttribute( "score" );
+                        $this->maxScore    = $element->getAttribute( 'score' );
                         break;
                     }
                 }
@@ -303,7 +308,7 @@
                         CURLOPT_USERAGENT,
                         'Mozilla/5.0 (Windows; U; Windows NT 5.1; ru-RU; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13'
                     );
-                    curl_setopt( $ch, CURLOPT_REFERER, "http://nagg.in.ua/" );
+                    curl_setopt( $ch, CURLOPT_REFERER, 'http://nagg.in.ua/' );
                     curl_setopt( $ch, CURLOPT_ENCODING, 'UTF-8' );
                     if (isset( $postParams ) && ! empty( $postParams )) {
                         curl_setopt( $ch, CURLOPT_HTTP_VERSION, '1.1' );
@@ -315,7 +320,7 @@
 
                     preg_match( '/charset=([a-z\-0-9]+)/i', $information, $headerMatch );
                     if (isset( $headerMatch[1] )) {
-                        $data = mb_convert_encoding( $data, "UTF-8", strtolower( $headerMatch[1] ) );
+                        $data = mb_convert_encoding( $data, 'UTF-8', strtolower( $headerMatch[1] ) );
                     } else {
                         preg_match( '/<meta.*?charset="?([a-z\-0-9]*)"?/i', $data, $matches );
                         if (isset( $matches[1] )) {
