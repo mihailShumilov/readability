@@ -16,7 +16,7 @@
   },
   "autoload": {
     "psr-4": {
-      "mihailshumilov\\readability\\": "src/"
+      "readabillity\\Readabillity\\": "src/"
     }
   },
   "license": "LGPL-2.1",
