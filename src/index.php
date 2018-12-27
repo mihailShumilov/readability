@@ -34,15 +34,26 @@
     <div class="row-fluid">
         <div class="col-xs-6">
             <h1>Parsed</h1>
+            <div>
             <?php
 
                 if (isset( $_REQUEST['url'] ) && ! empty( $_REQUEST['url'] )) {
                     require_once('Readabillity.php');
 
                     $r = new \readabillity\Readabillity( $_REQUEST['url'] );
-                    echo $r->getContent();
+
+                    $content = $r->getContent();
+                    $title = $r->getTitle();
+
+                    ?>
+                    <h2>TITLE: <?= $title; ?></h2>
+                    <div class="content">
+                        <?= $content; ?>
+                    </div>
+                <?php
                 }
             ?>
+            </div>
         </div>
         <div class="col-xs-6">
             <h1>Source</h1>
