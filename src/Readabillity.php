@@ -174,12 +174,12 @@ class Readabillity {
 
     protected function createDomObject() {
         $this->data = mb_convert_encoding($this->data, 'UTF-8', 'UTF-8');
-        $this->dom  = new \DOMDocument('1.1', 'utf-8');
+        $this->dom  = new \DOMDocument('1.1', 'UTF-8');
         libxml_use_internal_errors(true);
         $this->dom->preserveWhiteSpace = false;
-        $this->dom->loadHTML($this->data);
+        $this->dom->loadHTML('<?xml encoding="utf-8" ?>' . $this->data);
+        $this->title =  $this->dom->getElementsByTagName("title")->item(0)->textContent;
 
-        $this->title = $this->dom->getElementsByTagName("title")->item(0)->textContent;
     }
 
     private function clean() {
@@ -371,7 +371,6 @@ class Readabillity {
                 } else {
                     preg_match('/<meta.*?charset="?([a-z\-0-9]*)"?/i', $data, $matches);
                     if (isset($matches[1])) {
-
                         if ($charset = $matches[1]) {
                             $data = mb_convert_encoding($data, "UTF-8", strtolower($charset));
                         }
@@ -391,8 +390,6 @@ class Readabillity {
                 $tidy->cleanRepair();
                 $body = $tidy->html();
                 return $body->value;
-
-                return $data;
             } catch (Exception $e) {
                 return false;
             }
