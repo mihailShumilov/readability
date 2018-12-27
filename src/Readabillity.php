@@ -17,6 +17,7 @@ class Readabillity {
     private $contentNode = false;
     private $title;
     private $charset;
+    private $maxPolsition = 0;
 
     private $badTags = [
         'header',
@@ -146,6 +147,7 @@ class Readabillity {
             $this->calculateWeight();
             $this->clearContentNode();
             $this->clearByScore();
+            $this->clearByPosition();
 
             $this->cleanByCSS();
 
@@ -244,6 +246,10 @@ class Readabillity {
             $this->contentNode = $node;
         }
 
+        if ($this->maxPolsition < $selfPosition) {
+            $this->maxPolsition = $selfPosition;
+        }
+
         $linkCount = 1;
 
 
@@ -266,6 +272,13 @@ class Readabillity {
                 $linkScore = 'bad';
             }
         }
+
+        $removeByPosition = 'no';
+        $positionScore    = $selfPosition / $this->maxPolsition;
+        if ($positionScore > 0.3) {
+            $removeByPosition = 'yes';
+        }
+
         $node->setAttribute('level', $level);
         $node->setAttribute('charcount', $textLength);
         $node->setAttribute('score', $score);
@@ -273,6 +286,8 @@ class Readabillity {
         $node->setAttribute('linkscore', $linkScore);
         $node->setAttribute('linkscorevalue', $ls);
         $node->setAttribute('position', $selfPosition);
+        $node->setAttribute('positionScore', $positionScore);
+        $node->setAttribute('removeByPosition', $removeByPosition);
 
         if ('a' == $node->tagName) {
             $linkCount++;
@@ -304,6 +319,20 @@ class Readabillity {
         $xpath = new \DOMXpath($this->dom);
 
         foreach ($xpath->query("//*[@linkscore='bad']") as $node) {
+            $node->parentNode->removeChild($node);
+        }
+
+        return $this->dom->saveHTML();
+    }
+
+
+    /**
+     * @param bool|DOMElement $node
+     */
+    private function clearByPosition($node = false) {
+        $xpath = new \DOMXpath($this->dom);
+
+        foreach ($xpath->query("//*[@removeByPosition='yes']") as $node) {
             $node->parentNode->removeChild($node);
         }
 
@@ -350,18 +379,18 @@ class Readabillity {
                         $data = mb_convert_encoding($data, "UTF-8");
                     }
                 }
-                    $tidyConfig = [
-                        'clean'            => true,
-                        'drop-empty-paras' => true,
-                        'fix-backslash'    => true,
-                        'fix-bad-comments' => true,
-                        'fix-uri'          => true,
-                        'hide-comments'    => true
-                    ];
-                    $tidy       = tidy_parse_string( $data, $tidyConfig, 'utf8' );
-                    $tidy->cleanRepair();
-                    $body = $tidy->html();
-                    return $body->value;
+                $tidyConfig = [
+                    'clean'            => true,
+                    'drop-empty-paras' => true,
+                    'fix-backslash'    => true,
+                    'fix-bad-comments' => true,
+                    'fix-uri'          => true,
+                    'hide-comments'    => true
+                ];
+                $tidy       = tidy_parse_string($data, $tidyConfig, 'utf8');
+                $tidy->cleanRepair();
+                $body = $tidy->html();
+                return $body->value;
 
                 return $data;
             } catch (Exception $e) {
