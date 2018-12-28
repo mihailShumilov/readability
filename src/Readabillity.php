@@ -142,6 +142,7 @@ class Readabillity {
             $this->clearByScore();
 
             $this->data = $this->dom->saveHTML();
+//            return $this->data;
 
             $this->createDomObject();
             $this->calculateWeight();
