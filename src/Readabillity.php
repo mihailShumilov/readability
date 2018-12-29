@@ -276,7 +276,7 @@ class Readabillity {
 
         $removeByPosition = 'no';
         $positionScore    = $selfPosition / $this->maxPolsition;
-        if ($positionScore > 0.3) {
+        if ($positionScore > 0.38) {
             $removeByPosition = 'yes';
         }
 
