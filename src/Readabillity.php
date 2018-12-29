@@ -18,6 +18,7 @@ class Readabillity {
     private $title;
     private $charset;
     private $maxPolsition = 0;
+    private $charCount = [];
 
     private $badTags = [
         'header',
@@ -47,12 +48,14 @@ class Readabillity {
         "//*[php:function('preg_match', '/coment/iu', string(@id))>0]",
         "//*[php:function('preg_match', '/comment/iu', string(@class))>0]",
         "//*[php:function('preg_match', '/coment/iu', string(@class))>0]",
+        "//*[php:function('preg_match', '/footer/iu', string(@id))>0]",
         "//*[php:function('preg_match', '/footer/iu', string(@class))>0]",
-        "//*[php:function('preg_match', '/footer/iu', string(@class))>0]",
-        "//*[php:function('preg_match', '/header/iu', string(@class))>0]",
-        "//*[php:function('preg_match', '/header/iu', string(@class))>0]",
-        "//*[php:function('preg_match', '/menu/iu', string(@class))>0]",
-        "//*[php:function('preg_match', '/menu/iu', string(@class))>0]",
+//        "//*[php:function('preg_match', '/sidebar/iu', string(@id))>0]",
+//        "//*[php:function('preg_match', '/sidebar/iu', string(@class))>0]",
+//        "//*[php:function('preg_match', '/header/iu', string(@class))>0]",
+//        "//*[php:function('preg_match', '/header/iu', string(@class))>0]",
+//        "//*[php:function('preg_match', '/menu/iu', string(@class))>0]",
+//        "//*[php:function('preg_match', '/menu/iu', string(@class))>0]",
         //            "//*[php:function('preg_match', '/sidebar/iu', string(@id))>0]",
         //            "//*[php:function('preg_match', '/sidebar/iu', string(@class))>0]"
 
@@ -123,7 +126,7 @@ class Readabillity {
             $this->createDomObject();
             $this->clean();
 
-            $this->calculateWeight();
+            $this->calculateWeight(true);
 
             $this->clearContentNode();
 
@@ -150,7 +153,7 @@ class Readabillity {
             $this->clearByScore();
             $this->clearByPosition();
 
-            $this->cleanByCSS();
+//            $this->cleanByCSS();
 
 
             return $this->prepareResponseContent($this->dom->saveHTML());
@@ -221,10 +224,10 @@ class Readabillity {
         return $this->dom->saveHTML();
     }
 
-    private function calculateWeight() {
+    private function calculateWeight($storeCharCount = false) {
         $body  = $this->dom->getElementsByTagName('body')->item(0);
         $level = 0;
-        $this->processNode($body, $level);
+        $this->processNode($body, $level,$storeCharCount);
         return $this->dom->saveHTML();
     }
 
@@ -232,7 +235,7 @@ class Readabillity {
      * @param DOMElement $node
      * @param int        $level
      */
-    private function processNode($node, $level, &$position = 1) {
+    private function processNode($node, $level, $storeCharCount = false, &$position = 1) {
         $level++;
         $selfPosition = $position;
 
@@ -257,7 +260,7 @@ class Readabillity {
         foreach ($node->childNodes as $element) {
             $position++;
             if ($element->childNodes) {
-                $linkCount += $this->processNode($element, $level, $position);
+                $linkCount += $this->processNode($element, $level, $storeCharCount, $position);
             }
         }
 
@@ -278,6 +281,18 @@ class Readabillity {
         $positionScore    = $selfPosition / $this->maxPolsition;
         if ($positionScore > 0.38) {
             $removeByPosition = 'yes';
+        }
+
+        if($storeCharCount){
+            $this->charCount[] = $textLength;
+        }else{
+            if($this->charCount) {
+                $avg = array_sum($this->charCount) / count($this->charCount);
+                $node->setAttribute('avgcharcount', $avg);
+                if($textLength > $avg){
+                    $removeByPosition = 'no';
+                }
+            }
         }
 
         $node->setAttribute('level', $level);
