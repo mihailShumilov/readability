@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
 
     <!-- Latest compiled and minified JavaScript -->
-    <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 </head>
 <body style="padding-top: 40px;">
@@ -34,15 +34,26 @@
     <div class="row-fluid">
         <div class="col-xs-6">
             <h1>Parsed</h1>
+            <div>
             <?php
 
                 if (isset( $_REQUEST['url'] ) && ! empty( $_REQUEST['url'] )) {
-                    require_once( 'Readabillity.php' );
+                    require_once('Readabillity.php');
 
-                    $r = new \readability\Readabillity( $_REQUEST['url'] );
-                    echo $r->getContent();
+                    $r = new \readabillity\Readabillity( $_REQUEST['url'] );
+
+                    $content = $r->getContent();
+                    $title = $r->getTitle();
+
+                    ?>
+                    <h2>TITLE: <?= $title; ?></h2>
+                    <div class="content">
+                        <?= $content; ?>
+                    </div>
+                <?php
                 }
             ?>
+            </div>
         </div>
         <div class="col-xs-6">
             <h1>Source</h1>
